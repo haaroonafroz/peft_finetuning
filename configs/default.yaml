@@ -1,0 +1,80 @@
+# ============================================================
+# Default configuration — all values can be overridden by
+# model-specific YAML files or CLI --override flags.
+# ============================================================
+
+model:
+  name_or_path: "Qwen/Qwen3-8B"
+  torch_dtype: "bfloat16"          # bfloat16 | float16 | auto
+  trust_remote_code: true
+  attn_implementation: "flash_attention_2"  # flash_attention_2 | sdpa | eager
+
+quantization:
+  load_in_4bit: true
+  bnb_4bit_quant_type: "nf4"      # nf4 | fp4
+  bnb_4bit_compute_dtype: "bfloat16"
+  bnb_4bit_use_double_quant: true
+
+lora:
+  r: 64
+  lora_alpha: 128
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  # Auto-detected if null; override to target specific layers
+  target_modules: null
+
+dataset:
+  name: "bigbio/med_qa"
+  subset: "med_qa_en_source"
+  split_train: "train"
+  split_validation: "validation"
+  split_test: "test"
+  max_seq_length: 1024
+  preprocessing_num_workers: 4
+  # Prompt template — {question}, {options}, {answer} are replaced
+  prompt_template: |
+    Below is a medical question. Choose the correct answer.
+
+    ### Question:
+    {question}
+
+    ### Options:
+    {options}
+
+    ### Answer:
+    {answer}
+
+training:
+  output_dir: "outputs/default"
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
+  weight_decay: 0.01
+  warmup_ratio: 0.06
+  lr_scheduler_type: "cosine"
+  max_grad_norm: 1.0
+  logging_steps: 10
+  eval_strategy: "steps"
+  eval_steps: 100
+  save_strategy: "steps"
+  save_steps: 100
+  save_total_limit: 3
+  load_best_model_at_end: true
+  metric_for_best_model: "eval_loss"
+  greater_is_better: false
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  optim: "paged_adamw_8bit"
+  dataloader_pin_memory: true
+  dataloader_num_workers: 2
+  report_to: "wandb"               # wandb | tensorboard | none
+  seed: 42
+
+hub:
+  push_to_hub: false
+  hub_model_id: null
+  hub_private: false

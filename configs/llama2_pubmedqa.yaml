@@ -1,0 +1,36 @@
+# Llama-2-7B fine-tuned on PubMedQA with QLoRA
+# Inherits from default.yaml — only overrides are listed here.
+
+model:
+  name_or_path: "meta-llama/Llama-2-7b-hf"
+  attn_implementation: "sdpa"
+
+quantization:
+  bnb_4bit_compute_dtype: "float16"
+
+dataset:
+  name: "qiaojin/PubMedQA"
+  subset: "pqa_labeled"
+  split_train: "train"
+  split_validation: "validation"
+  split_test: "test"
+  prompt_template: |
+    You are a biomedical expert. Answer the following question based on the context.
+
+    ### Context:
+    {context}
+
+    ### Question:
+    {question}
+
+    ### Answer (yes/no/maybe):
+    {answer}
+
+training:
+  output_dir: "outputs/llama2-pubmedqa"
+  num_train_epochs: 5
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 1.0e-4
+  bf16: false
+  fp16: true

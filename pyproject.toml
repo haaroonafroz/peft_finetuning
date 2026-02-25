@@ -1,0 +1,20 @@
+[project]
+name = "peft-medical-finetuning"
+version = "0.1.0"
+description = "QLoRA fine-tuning of LLMs on medical datasets"
+requires-python = ">=3.10"
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "N", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

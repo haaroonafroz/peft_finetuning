@@ -1,0 +1,16 @@
+# Qwen3-8B fine-tuned on MedQA (USMLE) with QLoRA
+# Inherits from default.yaml — only overrides are listed here.
+
+model:
+  name_or_path: "Qwen/Qwen3-8B"
+
+dataset:
+  name: "bigbio/med_qa"
+  subset: "med_qa_en_source"
+
+training:
+  output_dir: "outputs/qwen3-medqa"
+  num_train_epochs: 3
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 8
+  learning_rate: 2.0e-4
