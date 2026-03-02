@@ -14,7 +14,7 @@ from transformers import (
     PreTrainedModel,
     PreTrainedTokenizerBase,
 )
-
+from accelerate import Accelerator
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -83,7 +83,7 @@ def load_model_and_tokenizer(
         "pretrained_model_name_or_path": model_name,
         "quantization_config": bnb_config,
         "torch_dtype": torch_dtype,
-        "device_map": "auto",
+        "device_map": {"": int(os.environ.get("LOCAL_RANK", 0))},
         "trust_remote_code": model_cfg.get("trust_remote_code", False),
         "token": token,
     }
