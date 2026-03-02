@@ -29,8 +29,8 @@ runs/
 *.safetensors
 
 # Data cache
-data/
 .cache/
+*__pycache__*
 
 # OS
 .DS_Store
