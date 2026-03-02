@@ -9,10 +9,19 @@ from typing import Any
 import torch
 from peft import AutoPeftModelForCausalLM
 from transformers import AutoTokenizer, PreTrainedModel, PreTrainedTokenizerBase
+from transformers import BitsAndBytesConfig
 
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
+
+# for loading adapter from a 4-bit quantized model
+bnb_config = BitsAndBytesConfig(
+    load_in_4bit=True,
+    bnb_4bit_quant_type="nf4",
+    bnb_4bit_compute_dtype=torch.bfloat16,
+    bnb_4bit_use_double_quant=True,
+)
 
 
 def load_adapter_for_inference(
@@ -28,10 +37,12 @@ def load_adapter_for_inference(
         device_map=device_map,
         torch_dtype=torch_dtype,
         trust_remote_code=True,
+        quantization_config=bnb_config,
     )
     tokenizer = AutoTokenizer.from_pretrained(str(adapter_path), trust_remote_code=True)
     if tokenizer.pad_token is None:
         tokenizer.pad_token = tokenizer.eos_token
+    tokenizer.padding_side = "left"
     model.eval()
     return model, tokenizer
 
