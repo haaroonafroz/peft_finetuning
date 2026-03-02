@@ -5,8 +5,8 @@ model:
   name_or_path: "Qwen/Qwen3-8B"
 
 dataset:
-  name: "bigbio/med_qa"
-  subset: "med_qa_en_source"
+  name: "GBaker/MedQA-USMLE-4-options"
+  subset: null
 
 training:
   output_dir: "outputs/qwen3-medqa"

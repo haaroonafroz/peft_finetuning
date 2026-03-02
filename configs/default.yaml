@@ -7,7 +7,7 @@ model:
   name_or_path: "Qwen/Qwen3-8B"
   torch_dtype: "bfloat16"          # bfloat16 | float16 | auto
   trust_remote_code: true
-  attn_implementation: "flash_attention_2"  # flash_attention_2 | sdpa | eager
+  attn_implementation: "sdpa"  # flash_attention_2 | sdpa | eager
 
 quantization:
   load_in_4bit: true
@@ -16,8 +16,8 @@ quantization:
   bnb_4bit_use_double_quant: true
 
 lora:
-  r: 64
-  lora_alpha: 128
+  r: 32
+  lora_alpha: 64
   lora_dropout: 0.05
   bias: "none"
   task_type: "CAUSAL_LM"
@@ -25,10 +25,11 @@ lora:
   target_modules: null
 
 dataset:
-  name: "bigbio/med_qa"
-  subset: "med_qa_en_source"
+  name: "GBaker/MedQA-USMLE-4-options"
+  subset: null
+  # trust_remote_code: true
   split_train: "train"
-  split_validation: "validation"
+  split_validation: "dev"
   split_test: "test"
   max_seq_length: 1024
   preprocessing_num_workers: 4
