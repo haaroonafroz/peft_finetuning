@@ -12,6 +12,7 @@ from transformers import (
     PreTrainedTokenizerBase,
     Trainer,
     TrainingArguments,
+    DataCollatorForSeq2Seq
 )
 
 from src.utils.logging import get_logger
@@ -64,7 +65,7 @@ def build_trainer(
     """Construct a ``Trainer`` wired up with the model, data, and config."""
     training_args = _build_training_args(cfg)
 
-    data_collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+    data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, padding=True)
 
     trainer = Trainer(
         model=model,
@@ -72,7 +73,7 @@ def build_trainer(
         train_dataset=dataset.get("train"),
         eval_dataset=dataset.get("validation"),
         data_collator=data_collator,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
     )
     return trainer
 
@@ -89,7 +90,7 @@ def run_training(trainer: Trainer, cfg: dict[str, Any]) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
 
     trainer.model.save_pretrained(str(output_dir))
-    trainer.tokenizer.save_pretrained(str(output_dir))
+    trainer.processing_class.save_pretrained(str(output_dir))
     logger.info("Adapter saved to %s", output_dir)
 
     return output_dir
