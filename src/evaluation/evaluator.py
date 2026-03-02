@@ -10,7 +10,7 @@ from typing import Any
 import torch
 from datasets import Dataset
 from torch.utils.data import DataLoader
-from transformers import DataCollatorForLanguageModeling, PreTrainedModel, PreTrainedTokenizerBase
+from transformers import DataCollatorForLanguageModeling, PreTrainedModel, PreTrainedTokenizerBase, DataCollatorForSeq2Seq
 
 from src.evaluation.metrics import compute_accuracy, compute_rouge
 from src.utils.logging import get_logger
@@ -25,7 +25,7 @@ def _compute_perplexity(
     batch_size: int = 4,
 ) -> float:
     """Compute perplexity on a tokenized dataset."""
-    collator = DataCollatorForLanguageModeling(tokenizer=tokenizer, mlm=False)
+    collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, model=model)
     loader = DataLoader(dataset, batch_size=batch_size, collate_fn=collator)
 
     total_loss = 0.0
