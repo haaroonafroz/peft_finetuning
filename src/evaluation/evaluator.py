@@ -12,7 +12,7 @@ from datasets import Dataset
 from torch.utils.data import DataLoader
 from transformers import DataCollatorForLanguageModeling, PreTrainedModel, PreTrainedTokenizerBase, DataCollatorForSeq2Seq
 
-from src.evaluation.metrics import compute_accuracy, compute_rouge
+from src.evaluation.metrics import compute_accuracy, compute_rouge, compute_semantic_similarity
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -72,11 +72,17 @@ def _generate_predictions(
                 max_new_tokens=max_new_tokens,
                 do_sample=False,
                 temperature=1.0,
+                stop_strings=["\n###", "\n\n###", "\n"],
+                tokenizer=tokenizer,
             )
 
         for j, ids in enumerate(output_ids):
             prompt_len = inputs["input_ids"][j].shape[0]
-            generated = tokenizer.decode(ids[prompt_len:], skip_special_tokens=True)
+            generated = tokenizer.decode(ids[prompt_len:], skip_special_tokens=True).strip()
+            for stop in ["\n###", "\n\n###", "\n"]:
+                if stop in generated:
+                    generated = generated[:generated.index(stop)].strip()
+                    break
             predictions.append(generated.strip())
 
     return predictions
@@ -113,9 +119,22 @@ def evaluate_model(
         references = []
 
         for row in raw_test_data:
-            question = row.get("question", row.get("QUESTION", ""))
-            answer = str(row.get("answer", row.get("final_decision", row.get("LONG_ANSWER", ""))))
-            prompts.append(f"### Question:\n{question}\n\n### Answer:\n")
+            question = row.get("question", "")
+            options_raw = row.get("options", {})
+            if isinstance(options_raw, dict):
+                options_str = "\n".join(f"  {k}. {v}" for k, v in options_raw.items())
+            else:
+                options_str = str(options_raw)
+            
+            answer = str(row.get("answer", row.get("answer_idx", "")))
+            
+            prompt = (
+                "Below is a medical question. Choose the correct answer.\n\n"
+                f"### Question:\n{question}\n\n"
+                f"### Options:\n{options_str}\n\n"
+                "### Answer:\n"
+            )
+            prompts.append(prompt)
             references.append(answer)
 
         if prompts:
@@ -131,6 +150,10 @@ def evaluate_model(
             rouge = compute_rouge(predictions, references)
             results.update({f"rouge_{k}": round(v, 4) for k, v in rouge.items()})
             logger.info("  ROUGE: %s", rouge)
+
+            semantic_similarity = compute_semantic_similarity(predictions, references)
+            results["semantic_similarity"] = round(semantic_similarity, 4)
+            logger.info("  Semantic Similarity: %.4f", semantic_similarity)
 
     # --- Save results ---
     output_dir = Path(cfg["training"]["output_dir"]) / "eval_results"
