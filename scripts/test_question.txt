@@ -1,0 +1,40 @@
+"Below is a medical question. Choose the correct answer.
+### Question:
+A mother brings her 3-week-old infant to the pediatrician's office because she is concerned about his feeding habits. He was born without complications and has not had any medical problems up until this time. However, for the past 4 days, he has been fussy, is regurgitating all of his feeds, and his vomit is yellow in color. On physical exam, the child's abdomen is minimally distended but no other abnormalities are appreciated. Which of the following embryologic errors could account for this presentation?
+
+### Options:
+A. Abnormal migration of ventral pancreatic bud
+B. Complete failure of proximal duodenum to recanalize
+C. Abnormal hypertrophy of the pylorus
+D. Failure of lateral body folds to move ventrally and fuse in the midline
+
+### Answer:
+"
+
+
+"Below is a medical question. Choose the correct answer.
+### Question:
+A 20-year-old woman presents with menorrhagia for the past several years. She says that her menses “have always been heavy”, and she has experienced easy bruising for as long as she can remember. Family history is significant for her mother, who had similar problems with bruising easily. The patient's vital signs include: heart rate 98/min, respiratory rate 14/min, temperature 36.1°C (96.9°F), and blood pressure 110/87 mm Hg. Physical examination is unremarkable. Laboratory tests show the following: platelet count 200,000/mm3, PT 12 seconds, and PTT 43 seconds. Which of the following is the most likely cause of this patient’s symptoms?
+
+### Options:
+A. Hemophilia A
+B. Lupus anticoagulant
+C. Protein C deficiency
+D. Von Willebrand disease
+
+### Answer:
+"
+
+
+"Below is a medical question. Choose the correct answer.
+### Question:
+What is the most common cause of acute pancreatitis?
+
+### Options:
+  A. Gallstones
+  B. Alcohol abuse
+  C. Hypertriglyceridemia
+  D. Drug-induced
+
+### Answer:
+"
