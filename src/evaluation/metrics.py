@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 
 from rouge_score import rouge_scorer
+from transformers import AutoTokenizer, AutoModel
+import torch
 
 
 def _normalize(text: str) -> str:
@@ -39,3 +41,31 @@ def compute_rouge(predictions: list[str], references: list[str]) -> dict[str, fl
 
     n = max(len(predictions), 1)
     return {"1": r1 / n, "2": r2 / n, "L": rl / n}
+
+
+def compute_semantic_similarity(
+    predictions: list[str],
+    references: list[str],
+    model_name: str = "NeuML/pubmedbert-base-embeddings",
+    batch_size: int = 32,
+) -> float:
+    tokenizer = AutoTokenizer.from_pretrained(model_name)
+    model = AutoModel.from_pretrained(model_name)
+    model.eval()
+
+    def encode(texts):
+        all_embeddings = []
+        for i in range(0, len(texts), batch_size):
+            batch = texts[i:i + batch_size]
+            inputs = tokenizer(batch, padding=True, truncation=True, return_tensors="pt")
+            with torch.no_grad():
+                outputs = model(**inputs)
+            embeddings = outputs.last_hidden_state[:, 0]  # CLS token
+            embeddings = torch.nn.functional.normalize(embeddings, dim=1)
+            all_embeddings.append(embeddings)
+        return torch.cat(all_embeddings, dim=0)
+
+    pred_embs = encode(predictions)
+    ref_embs = encode(references)
+    similarities = (pred_embs * ref_embs).sum(dim=1)
+    return similarities.mean().item()
