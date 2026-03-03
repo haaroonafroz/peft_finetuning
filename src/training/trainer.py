@@ -12,20 +12,31 @@ from transformers import (
     PreTrainedTokenizerBase,
     Trainer,
     TrainingArguments,
-    DataCollatorForSeq2Seq
+    DataCollatorForSeq2Seq,
+    # DataCollatorForCompletionOnlyLM,
 )
+from trl import SFTTrainer, SFTConfig
 
 from src.utils.logging import get_logger
 
 logger = get_logger(__name__)
 
 
-def _build_training_args(cfg: dict[str, Any]) -> TrainingArguments:
+def _build_training_args(cfg: dict[str, Any]) -> SFTConfig:
     t = cfg["training"]
+    run_name = t.get("run_name") or (
+        f"{cfg['model']['name_or_path'].split('/')[-1]}"
+        f"_r{cfg.get('QLoRA', {}).get('r', 32)}"
+        # f"_lr{t.get('learning_rate', 2e-4)}"
+        f"_ep{t.get('num_train_epochs', 3)}"
+        f"_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    )
     output_dir = t.get("output_dir", "outputs/default")
 
-    return TrainingArguments(
+    return SFTConfig(
         output_dir=output_dir,
+        run_name=run_name,
+        completion_only_loss=True,
         num_train_epochs=t.get("num_train_epochs", 3),
         per_device_train_batch_size=t.get("per_device_train_batch_size", 2),
         per_device_eval_batch_size=t.get("per_device_eval_batch_size", 2),
@@ -61,18 +72,18 @@ def build_trainer(
     tokenizer: PreTrainedTokenizerBase,
     dataset: DatasetDict,
     cfg: dict[str, Any],
-) -> Trainer:
+) -> SFTTrainer:
     """Construct a ``Trainer`` wired up with the model, data, and config."""
     training_args = _build_training_args(cfg)
 
-    data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, padding=True)
-
-    trainer = Trainer(
+    # data_collator = DataCollatorForSeq2Seq(tokenizer=tokenizer, padding=True)
+    # data_collator = DataCollatorForCompletionOnlyLM(response_template="### Answer:\n", tokenizer=tokenizer, padding=True)
+    trainer = SFTTrainer(
         model=model,
         args=training_args,
         train_dataset=dataset.get("train"),
         eval_dataset=dataset.get("validation"),
-        data_collator=data_collator,
+        # data_collator=data_collator,
         processing_class=tokenizer,
     )
     return trainer
