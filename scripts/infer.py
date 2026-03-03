@@ -26,8 +26,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prompt", type=str, default=None, help="Single prompt (interactive mode)")
     parser.add_argument("--input-file", type=str, default=None, help="JSONL file of prompts")
     parser.add_argument("--output-file", type=str, default=None, help="Output JSONL file")
-    parser.add_argument("--max-new-tokens", type=int, default=256)
-    parser.add_argument("--temperature", type=float, default=0.7)
+    parser.add_argument("--max-new-tokens", type=int, default=64)
+    parser.add_argument("--temperature", type=float, default=0.3)
     parser.add_argument("--override", action="append", default=[])
     return parser.parse_args()
 
