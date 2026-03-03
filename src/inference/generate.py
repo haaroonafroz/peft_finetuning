@@ -52,8 +52,8 @@ def generate_response(
     tokenizer: PreTrainedTokenizerBase,
     prompt: str,
     *,
-    max_new_tokens: int = 256,
-    temperature: float = 0.7,
+    max_new_tokens: int = 128,
+    temperature: float = 0.3,
     top_p: float = 0.9,
     do_sample: bool = True,
 ) -> str:
@@ -65,8 +65,8 @@ def generate_response(
             **inputs,
             max_new_tokens=max_new_tokens,
             temperature=temperature,
-            top_p=top_p,
-            do_sample=do_sample,
+            stop_strings=["\n###", "\n\n###", "\n"],
+            tokenizer=tokenizer,
         )
 
     prompt_len = inputs["input_ids"].shape[1]
