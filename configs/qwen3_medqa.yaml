@@ -9,8 +9,9 @@ dataset:
   subset: null
 
 training:
+  run_name: "qwen3-medqa-QLORA-3Epochs-v1"
   output_dir: "outputs/qwen3-medqa"
   num_train_epochs: 3
   per_device_train_batch_size: 2
   gradient_accumulation_steps: 8
-  learning_rate: 2.0e-4
+  learning_rate: 1.0e-4
