@@ -156,7 +156,7 @@ def evaluate_model(
             logger.info("  Semantic Similarity: %.4f", semantic_similarity)
 
     # --- Save results ---
-    output_dir = Path(cfg["training"]["output_dir"]) / "eval_results"
+    output_dir = Path(cfg["training"]["output_dir"]) / cfg["training"]["run_name"] / "eval_results"
     output_dir.mkdir(parents=True, exist_ok=True)
     results_file = output_dir / "metrics.json"
     with open(results_file, "w") as f:

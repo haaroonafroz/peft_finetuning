@@ -97,7 +97,7 @@ def run_training(trainer: Trainer, cfg: dict[str, Any]) -> Path:
     logger.info("Starting training ...")
     trainer.train()
 
-    output_dir = Path(cfg["training"]["output_dir"]) / "final_adapter"
+    output_dir = Path(cfg["training"]["output_dir"]) / cfg["training"]["run_name"] / "final_adapter"
     output_dir.mkdir(parents=True, exist_ok=True)
 
     trainer.model.save_pretrained(str(output_dir))
