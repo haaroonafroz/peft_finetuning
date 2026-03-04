@@ -8,9 +8,18 @@ dataset:
   name: "GBaker/MedQA-USMLE-4-options"
   subset: null
 
+lora:
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  bias: "none"
+  task_type: "CAUSAL_LM"
+  # Auto-detected if null; override to target specific layers
+  target_modules: null
+
 training:
-  run_name: "qwen3-medqa-QLORA-3Epochs-v1"
-  output_dir: "outputs/qwen3-medqa"
+  run_name: "qwen3-medqa-QLORA-3Epochs-r16-a32"
+  output_dir: "outputs"
   num_train_epochs: 3
   per_device_train_batch_size: 2
   gradient_accumulation_steps: 8
