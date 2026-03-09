@@ -163,31 +163,35 @@ Semantic similarity uses `NeuML/pubmedbert-base-embeddings`, a domain-specific b
 
 | Config | Rank (r) | Alpha (α) | α/r | Target Modules | Trainable Params | % of Total | Perplexity ↓ | Accuracy ↑ | ROUGE-1 ↑ | ROUGE-2 ↑ | ROUGE-L ↑ | Semantic Sim ↑ |
 |--------|----------|-----------|-----|----------------|-----------------|------------|-------------|-----------|-----------|-----------|-----------|---------------|
+| r8-a16 | 8 | 16 | 2.0 | q_proj, v_proj | ~3.83M | 0.05% | 3.3031 | 0.64 | 0.6766 | 0.5164 | 0.6766 |  0.8172 |
 | r16-a32 | 16 | 32 | 2.0 | q_proj, v_proj | ~7.7M | 0.09% | 3.277 | 0.620 | 0.657 | 0.493 | 0.657 | 0.809 |
 | r32-a64 | 32 | 64 | 2.0 | q_proj, v_proj | ~15.3M | 0.19% | 3.256 | 0.580 | 0.641 | 0.478 | 0.641 | 0.803 |
 
-**Base model**: Qwen/Qwen3-8B (8.22B parameters) — evaluated on 50 test samples with seed 42.
+**Base model**: Qwen/Qwen3-8B (8.22B parameters) — evaluated on 50 test samples with seed 42.  
+
+### Llama-3.1-8B on MedQA
+
+| Config | Rank (r) | Alpha (α) | α/r | Target Modules | Trainable Params | % of Total | Perplexity ↓ | Accuracy ↑ | ROUGE-1 ↑ | ROUGE-2 ↑ | ROUGE-L ↑ | Semantic Sim ↑ |
+|--------|----------|-----------|-----|----------------|-----------------|------------|-------------|-----------|-----------|-----------|-----------|---------------|
+| r8-a16 | 8 | 16 | 2.0 | q_proj, v_proj | ~3.4M | 0.04% | 3.2698 | 0.52 | 0.6289 | 0.4169 | 0.6273 |  0.8025 |
+| r16-a32 | 16 | 32 | 2.0 | q_proj, v_proj | ~6,8M | 0.08% | 3.265 | 0.54 | 0.6421 | 0.4169 | 0.6404 | 0.8121 |
+| r32-a64 | 32 | 64 | 2.0 | q_proj, v_proj | ~13.6M | 0.17% | 3.2413 | 0.52 | 0.6232 | 0.4369 | 0.6215 | 0.7946 |
+
+**Base model**: Meta-Llama/Llama-8B (8.04B parameters) — evaluated on 50 test samples with seed 42.
 
 ### Observations
 
-- **r=16 slightly outperforms r=32** on accuracy (62% vs 58%) despite having half the trainable parameters. This suggests the model may be mildly overfitting at higher rank with only 3 epochs and 9K training examples, or that the smaller adapter generalizes better on this dataset size.
-- **Perplexity is comparable** across both configurations (~3.26–3.28), indicating similar language modeling capability.
-- **Semantic similarity is high** for both (>0.80), confirming the model produces answers that are semantically close to the ground truth even when surface-level metrics vary.
+- **Qwen3-8B**: Accuracy is highest at **r=8** (64%), then r=16 (62%), then r=32 (58%) — the smallest adapter generalizes best on this setup. Perplexity improves as rank increases (3.30 → 3.28 → 3.26).
+- **Llama-3.1-8B**: Accuracy peaks at **r=16** (54%), with r=8 and r=32 both at 52%. Perplexity also improves with rank (3.27 → 3.27 → 3.24). For Llama, a mid-rank adapter appears to balance capacity and generalization.
+- **Perplexity** decreases with higher rank for both models, indicating better in-distribution fit, while accuracy does not always improve — consistent with possible overfitting at higher rank with 3 epochs and ~9K training examples.
+- **Semantic similarity** is high for all configs (Qwen 0.80–0.82, Llama 0.79–0.81), so generated answers stay semantically close to the reference even when exact-match accuracy varies.
 - The **α/r ratio is fixed at 2.0** across experiments. Future work could vary this ratio to study its effect independently.
 
-## Planned Experiments
-
-| Model | HF Hub ID | Parameters | Dataset | Status |
-|-------|-----------|------------|---------|--------|
-| Qwen3-8B | `Qwen/Qwen3-8B` | 8.22B | MedQA | r=16, r=32 complete |
-| Qwen3-8B | `Qwen/Qwen3-8B` | 8.22B | MedQA | r=64 planned |
-| Llama-3.1-8B | `meta-llama/Llama-3.1-8B` | 8.03B | MedQA | Planned |
-| Mistral-7B-v0.3 | `mistralai/Mistral-7B-v0.3` | 7.25B | MedQA | Planned |
 
 Upcoming ablations will study:
 
 - **Rank scaling**: r ∈ {8, 16, 32, 64, 128} at fixed α/r = 2
-- **Cross-architecture comparison**: Qwen3-8B vs. Llama-3.1-8B vs. Mistral-7B on the same dataset and QLoRA configuration
+- **Cross-architecture comparison**: Qwen3-8B vs. Llama-3.1-8B on the same dataset and QLoRA configuration
 - **Target module expansion**: Adding gate_proj, up_proj, down_proj to the target modules alongside q_proj and v_proj
 - **Epoch scaling**: 3 vs. 5 vs. 7 epochs to measure overfitting thresholds per rank
 

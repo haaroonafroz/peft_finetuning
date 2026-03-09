@@ -11,8 +11,8 @@ dataset:
   subset: null
 
 lora:
-  r: 16
-  lora_alpha: 32
+  r: 8
+  lora_alpha: 16
   lora_dropout: 0.05
   bias: "none"
   task_type: "CAUSAL_LM"
@@ -20,7 +20,7 @@ lora:
   target_modules: null
 
 training:
-  run_name: "qwen3-medqa-QLORA-3Epochs-r16-a32"
+  run_name: "qwen3-medqa-QLORA-3Epochs-r8-a16"
   output_dir: "outputs"
   num_train_epochs: 3
   per_device_train_batch_size: 2
